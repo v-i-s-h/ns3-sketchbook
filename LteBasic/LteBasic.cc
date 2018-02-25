@@ -44,7 +44,7 @@ int main( int argc, char *argv[] ) {
     lteHelper->ActivateDataRadioBearer( ueDevs, bearer );
 
     // Setup simulation time
-    Simulator::Stop( Seconds(0.005) );
+    Simulator::Stop( Seconds(10) );
 
     // Configure Logs
     lteHelper->EnablePhyTraces();
