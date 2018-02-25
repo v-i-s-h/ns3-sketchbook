@@ -1,10 +1,19 @@
 // Single Cell Test bed for LTE Cellular communications
 
+/*
+Run Commands:
+1.  ./waf --run scratch/Lte1CellTestbed/Lte1CellTestbed --cwd scratch/Lte1CellTestbed/logs
+
+2. ./waf --command-template="%s --ns3::ConfigStore::Filename=run.cfg --ns3::ConfigStore::Mode=Load --ns3::ConfigStore::FileFormat=RawText" --run "scratch/Lte1CellTestbed/Lte1CellTestbed" --cwd "scratch/Lte1CellTestbed/logs"
+*/
+
 #include <ns3/core-module.h>
 #include <ns3/network-module.h>
 #include <ns3/mobility-module.h>
 #include <ns3/lte-module.h>
 #include <ns3/config-store.h>
+
+#include "progress-bar.h"
 
 using namespace ns3;
 
@@ -26,7 +35,7 @@ int main( int argc, char *argv[] ) {
     uint32_t nMobileUes = 4;
     uint32_t nStaticUes = 4;
 
-    Time simDuration    = Seconds( 10.00 );
+    double simDuration    = 75.00;
     Time::SetResolution( Time::NS );
 
     // Create Nodes
@@ -83,7 +92,11 @@ int main( int argc, char *argv[] ) {
     lteHelper->EnableTraces();
 
     // Setup simulation durtation
-    Simulator::Stop( simDuration );
+    Simulator::Stop( Seconds(simDuration) );
+
+    // Setup Progress bar
+    sim::ProgressBar progressBar( simDuration );
+    progressBar.Enable();
 
     Simulator::Run();
 

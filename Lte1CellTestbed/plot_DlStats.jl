@@ -1,27 +1,33 @@
 # Plot data from DlRsrpSinrStats
-
 using PyPlot
 
+# Column Definitions in log file
+const COL_TIME      = 1
+const COL_USER_ID   = 3
+const COL_RSRP      = 5
+const COL_SINR      = 6
 
 # Load Data
-data, header = readdlm( "./DlRsrpSinrStats.txt", '\t', header=true );
+data, header = readdlm( "./logs/DlRsrpSinrStats.txt", '\t', header=true );
 
-noOfUsers   = unique( data[:,3] );
-noOfEnbs    = unique( data[:,2] );
-
-# Extract data for users -- assuming 2+2 users per Cell
-data_u1 = data[ data[:,3].==1, : ];
-data_u2 = data[ data[:,3].==2, : ];
-data_u3 = data[ data[:,3].==3, : ];
-data_u4 = data[ data[:,3].==4, : ];
+ueIds   = Integer.(unique( data[:,3] ));
+enbIds  = Integer.(unique( data[:,2] ));
 
 # Plot data
-figure();
-plot( data_u1[:,1], 10*log(data_u1[:,6]), label = "User 1" );
-plot( data_u2[:,1], 10*log(data_u2[:,6]), label = "User 2" );
-plot( data_u3[:,1], 10*log(data_u3[:,6]), label = "User 3" );
-plot( data_u4[:,1], 10*log(data_u4[:,6]), label = "User 4" );
-grid();
-ylabel( "SINR(dB)" );
-xlabel( "Time" );
-legend();
+f_rsrp  = figure();
+f_sinr  = figure();
+# Plot SINR for all users
+timeIdx = data[ data[:,COL_USER_ID].==ueIds[1], COL_TIME ];   # assuming time points will be same for all users
+for ueId ∈ ueIds
+    userRowIdx  = data[:,COL_USER_ID].==ueId
+    sinr    = 10 * log.( data[userRowIdx,COL_SINR] );
+    rsrp    = 10 * log.( 1000*data[userRowIdx,COL_RSRP] );
+    figure( f_sinr[:number] );  plot( timeIdx, sinr, label = @sprintf("User %2d",ueId) );
+    figure( f_rsrp[:number] );  plot( timeIdx, rsrp, label = @sprintf("User %2d",ueId) );
+end
+figure( f_sinr[:number] )
+    grid(); legend();
+    ylabel( "SINR(dB)" );   xlabel( "Time" );
+figure( f_rsrp[:number] )
+    grid(); legend();
+    ylabel( "RSRP(dBm)" );   xlabel( "Time" );
